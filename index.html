@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Colegio Montano - Reading Unit 4 Interactive Whiteboard</title>
+    <style>
+        :root {
+            --primary-blue: #1269A8;
+            --bright-yellow: #F7D615;
+            --grayish-green: #54887D;
+            --light-blue: #88B5C7;
+            --olive-green: #A6B046;
+            --soft-bg: #F2F5E9;
+            --text-dark: #2C3E50;
+            --white: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--soft-bg);
+            color: var(--text-dark);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Header Styling */
+        header {
+            background-color: var(--primary-blue);
+            color: var(--white);
+            padding: 15px 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--bright-yellow);
+            background: white;
+        }
+
+        .header-title h1 {
+            font-size: 1.4rem;
+            color: var(--bright-yellow);
+        }
+
+        .header-title p {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .fullscreen-btn {
+            background-color: var(--bright-yellow);
+            color: var(--text-dark);
+            border: none;
+            padding: 8px 16px;
+            font-weight: bold;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .fullscreen-btn:hover {
+            background-color: #e5c40e;
+            transform: scale(1.05);
+        }
+
+        /* Week & Class Selector Bar */
+        .selector-bar {
+            background-color: var(--light-blue);
+            padding: 10px 20px;
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            align-items: center;
+            border-bottom: 2px solid #729eb2;
+        }
+
+        .week-btn {
+            background-color: var(--white);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--text-dark);
+            white-space: nowrap;
+            transition: all 0.2s;
+        }
+
+        .week-btn.active {
+            background-color: var(--grayish-green);
+            color: var(--white);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Main Workspace */
+        .workspace {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        /* Tabs Bar */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .tab-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px 8px 0 0;
+            background-color: #d1dcdd;
+            color: var(--text-dark);
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background-color 0.3s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--grayish-green);
+            color: var(--white);
+        }
+
+        /* Card Content Area */
+        .card-content {
+            background-color: var(--white);
+            flex: 1;
+            border-radius: 0 8px 8px 8px;
+            padding: 25px;
+            overflow-y: auto;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.05);
+            border-top: 4px solid var(--grayish-green);
+        }
+
+        .pane {
+            display: none;
+        }
+
+        .pane.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(4px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Typography & Components inside Panes */
+        h2 {
+            color: var(--primary-blue);
+            margin-bottom: 15px;
+            font-size: 1.5rem;
+        }
+
+        h3 {
+            color: var(--grayish-green);
+            margin: 15px 0 8px 0;
+            font-size: 1.1rem;
+        }
+
+        p, li {
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        ul {
+            padding-left: 20px;
+        }
+
+        .badge {
+            display: inline-block;
+            background-color: var(--olive-green);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .habit-badge {
+            background-color: var(--primary-blue);
+        }
+
+        /* Accordions / Hidden Solution Buttons */
+        .accordion {
+            background-color: #eaf2f4;
+            color: var(--primary-blue);
+            cursor: pointer;
+            padding: 12px 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 6px;
+            margin: 10px 0 5px 0;
+            transition: background 0.2s;
+        }
+
+        .accordion:hover {
+            background-color: #d2e4e8;
+        }
+
+        .panel {
+            padding: 0 18px;
+            background-color: white;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            border-left: 3px solid var(--primary-blue);
+            margin-bottom: 10px;
+        }
+
+        .panel p {
+            padding: 10px 0;
+        }
+
+        /* Checklist / Rubric Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            border: 1px solid #d1dede;
+            padding: 10px;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--light-blue);
+            color: var(--text-dark);
+        }
+
+        .home-activity {
+            background-color: #fcf9e8;
+            border-left: 4px solid var(--bright-yellow);
+            padding: 15px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="header-left">
+            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyEop0yf6lZ7Jk9MILZxF1rBj4Oqs5esyhIQ&s" alt="Colegio Montano Logo" class="logo">
+            <div class="header-title">
+                <h1>Colegio Montano — Reading Unit 4 (1st Grade)</h1>
+                <p>Teacher: Nicole De León | Aug 12 – Oct 12 (8 Weeks, 8 Classes)</p>
+            </div>
+        </div>
+        <button class="fullscreen-btn" onclick="toggleFullScreen()">⤢ Full Screen</button>
+    </header>
+
+    <div class="selector-bar" id="weekSelector">
+        <!-- Week Buttons generated dynamically -->
+    </div>
+
+    <div class="workspace">
+        <div class="tabs-container">
+            <button class="tab-btn active" onclick="switchTab(0)">I) Motivating Intro (~5m)</button>
+            <button class="tab-btn" onclick="switchTab(1)">II) Individual Work (20m)</button>
+            <button class="tab-btn" onclick="switchTab(2)">III) Cooperative Work (30m)</button>
+            <button class="tab-btn" onclick="switchTab(3)">IV) Plenary & Closing (15m)</button>
+        </div>
+
+        <div class="card-content">
+            <!-- PANE I -->
+            <div id="pane-0" class="pane active">
+                <span class="badge" id="badge-unit">Unit Theme</span>
+                <span class="badge habit-badge" id="badge-habit">Leader in Me Habit</span>
+                <h2 id="intro-title">Introduction & Warm-up</h2>
+                <p id="intro-desc">Loading activity...</p>
+            </div>
+
+            <!-- PANE II -->
+            <div id="pane-1" class="pane">
+                <h2>Individual Work & Practice</h2>
+                <p id="ind-desc">Loading individual tasks...</p>
+                <div id="ind-interactive"></div>
+            </div>
+
+            <!-- PANE III -->
+            <div id="pane-2" class="pane">
+                <h2>Cooperative Teamwork</h2>
+                <p id="coop-desc">Loading collaborative task...</p>
+            </div>
+
+            <!-- PANE IV -->
+            <div id="pane-3" class="pane">
+                <h2>Plenary & Rubric Evaluation</h2>
+                <p id="plenary-desc">Loading plenary details...</p>
+                <div id="plenary-rubric"></div>
+                <div class="home-activity" id="home-act">
+                    <strong>🏠 Home Research Challenge:</strong> <span id="home-text">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const curriculumData = [
+            {
+                week: "Week 1 (Aug 12)",
+                unitNum: "Unit 8: Food (Part 1)",
+                theme: "Fun Food & Food Sculptures (Student Book pp. 140-141)",
+                habit: "Habit 1: Be Proactive",
+                cnb: "CNB: Identifies visual details and vocabulary related to everyday food categories and sculptures.",
+                intro: "Brain Gym: 'Food Freeze Dance'. Warm-up vocabulary review of Unit 7 and introduction of Unit 8 food words (apple, banana, cookie, orange, trees, people, houses, clouds). Ask students: 'Can food look like art?'",
+                individual: "Complete Workbook / Student Book page 141, exercises #2 (Listen & Read - circle yes/no) and #3 (Match food sculptures).",
+                indSolutionTitle: "🔍 Click here for Answer Key & Teacher Guidance",
+                indSolutionContent: "Exercise 2: 1. yes, 2. no, 3. yes. Exercise 3: Match apple to 1st image, banana to 2nd image, cookie/orange structure to respective items.",
+                coop: "Pairs (Roles: Speaker & Navigator): Look at page 140 picture. Create a mini list of 3 strange things made of food they spot in the big food landscape.",
+                plenary: "Teams share their 3 strange food objects. Guiding question: 'How can ordinary food become extraordinary art?' Interactive Game: 'Vocabulary Quick-Flash' (apple, banana, orange).",
+                home: "Ask parents at home what their favorite fruit-based snack is and bring a drawing of it next class."
+            },
+            {
+                week: "Week 2 (Aug 19)",
+                unitNum: "Unit 8: Food (Part 2)",
+                theme: "Eating Good Food & Writing Favorites (Student Book pp. 142-143)",
+                habit: "Habit 2: Begin with the End in Mind",
+                cnb: "CNB: Writes simple descriptive sentences expressing personal preferences about food and healthy habits.",
+                intro: "Vocabulary Review: Rapid flashcard review of fruit/food words from Week 1. Chant: 'Eat good food, feel great mood!' Read short text on page 142 ('My favorite food is chicken...').",
+                individual: "Workbook page 142, exercise #2: Draw and write about your favorite food ('My favorite food is...').",
+                indSolutionTitle: "🔍 Click here for Writing Scaffold & Example",
+                indSolutionContent: "Example model on board: 'My favorite food is pizza. I like pizza and apple juice.' Ensure students use correct capitalization and periods.",
+                coop: "Groups of three: 'Think-Pair-Share' (page 143). Discuss: 'What do you eat and drink to stay healthy?' Build a shared healthy plate collage using cutout pictures.",
+                plenary: "Group mini-presentation of healthy plates. Guiding question: 'Why is drinking enough water important?' Interactive Trivia: 'Healthy or Not Healthy?'",
+                home: "Observe what vegetables are eaten at dinner tonight and write down one color you saw."
+            },
+            {
+                week: "Week 3 (Aug 26)",
+                unitNum: "Unit 8: Food (Part 3)",
+                theme: "Fruit Sources & Where They Grow (Student Book pp. 100-101)",
+                habit: "Habit 3: Put First Things First",
+                cnb: "CNB: Interprets simple informational charts and categorizes food origins (trees vs. farms).",
+                intro: "Warm-up vocabulary review of Unit 8 food items (lemon, apple, orange, juice, water). Interactive guessing game: 'I am yellow, sour, and grow on a tree. What am I?' (Lemon).",
+                individual: "Student Book page 101, exercise #3 (Look at the chart, read and write) and exercise #4 (Match tree photos).",
+                indSolutionTitle: "🔍 Click here for Chart Answer Key",
+                indSolutionContent: "Chart completion: Where do people grow fruit? (farms). What fruits grow on trees? (lemons, apples, oranges). What can people do with fruit? (make juice/lemonade).",
+                coop: "In pairs, complete exercise #5 or role-play a farmer harvesting fruit. Assign roles: Farmer and Juice Maker.",
+                plenary: "Pairs share their completed chart branches. Guiding questions: 'Do all fruits grow on trees?' Interactive Game: 'Tree or Farm Sort'.",
+                home: "Count how many pieces of fruit are in your kitchen pantry or refrigerator and report the number tomorrow."
+            },
+            {
+                week: "Week 4 (Sep 2)",
+                unitNum: "Unit 8: Food (Part 4)",
+                theme: "Family Picnics & Pronoun Usage (Student Book pp. 102-103)",
+                habit: "Habit 4: Think Win-Win",
+                cnb: "CNB: Applies subject pronouns (I, You, He, She) correctly in written sentences about family food preferences.",
+                intro: "Vocabulary review of drink and food verbs (likes, eating, drinking). Brainstorming session looking at the family picnic illustration on page 102.",
+                individual: "Workbook page 102, exercise #1 (Look at picture, write what family likes) and exercise #2 (Read and write with pronouns He, She, I, You).",
+                indSolutionTitle: "🔍 Click here for Pronoun Exercise Guidance",
+                indSolutionContent: "Exercise 2 answers: 1. He likes pizza., 2. She likes milk., 3. I like pizza (or matching table)., 4. You like orange juice.",
+                coop: "Small groups: Act out a picnic scene where each member states what they like to eat and drink using correct pronouns ('He likes...', 'She likes...').",
+                plenary: "Groups act out 1 sentence for the class to guess. Guiding questions: 'How do we share food fairly with family and friends?' Interactive Spelling / Word Unscramble.",
+                home: "Ask a family member: 'What do you like to drink for breakfast?' and write down their answer."
+            },
+            {
+                week: "Week 5 (Sep 9)",
+                unitNum: "Unit 9: Animals (Part 1)",
+                theme: "Animal Babies & Families (Student Book pp. 156-157)",
+                habit: "Habit 5: Seek First to Understand, Then to Be Understood",
+                cnb: "CNB: Connects adult animal names with their corresponding baby names (kitten, puppy, chick, bunny, calf, kid).",
+                intro: "Warm-up vocabulary review of Unit 8 food words and transition into Unit 9 animals. Sound game: Make animal noises (cat, dog, chick, elephant) and have students identify them.",
+                individual: "Student Book page 157, exercise #2 (Listen & read circle yes/no) and #3 (Animal Families matching: cat -> kitten, etc.).",
+                indSolutionTitle: "🔍 Click here for Animal Families Answer Key",
+                indSolutionContent: "Exercise 2: 1. yes, 2. no, 3. yes. Exercise 3: cat->kitten, dog->puppy, chicken->chick, rabbit->bunny, sheep->lamb/sheep, elephant->calf.",
+                coop: "Pairs: Exercise #4 'Look and write' counting animal babies in the photo grid. Assign roles: Counter and Writer.",
+                plenary: "Teams present their baby animal counts. Guiding question: 'Why do baby animals look like their parents?' Interactive game: 'Baby Animal Match-Up Trivia'.",
+                home: "Look up a picture of a baby panda or baby lion online with an adult helper and learn its special name."
+            },
+            {
+                week: "Week 6 (Sep 16)",
+                unitNum: "Unit 9: Animals (Part 2)",
+                theme: "Pets & Animal Characteristics (Student Book pp. 112-113)",
+                habit: "Habit 6: Synergize",
+                cnb: "CNB: Compares pet types and describes their attributes and baby names through guided reading comprehension.",
+                intro: "Vocabulary review of baby animals (kitten, puppy, kid, hatchling). Warm-up discussion: 'Who has a pet at home? Raise your hand!' Read page 112 text on Pets.",
+                individual: "Workbook page 113, exercise #2 (Circle yes/no) and #3 (Write answers: What is a baby cat called? A kitten).",
+                indSolutionTitle: "🔍 Click here for Reading Comprehension Key",
+                indSolutionContent: "Exercise 2: 1. no, 2. yes, 3. yes. Exercise 3: 1. A kitten., 2. They like to play and jump., 3. A hatchling.",
+                coop: "Pairs: Exercise #4 'What about you?' Interview partner about pets they have or like. Role-play interviewer and interviewee.",
+                plenary: "Volunteers share their partner's favorite pet in front of the class. Guiding question: 'How do pets help us work together and feel happy?' Digital Pasapalabra trivia.",
+                home: "Draw your dream pet and write 1 sentence about what it likes to do."
+            },
+            {
+                week: "Week 7 (Sep 23)",
+                unitNum: "Unit 9: Animals (Part 3)",
+                theme: "Ducks & Action Writing (Student Book pp. 114)",
+                habit: "Habit 7: Sharpen the Saw",
+                cnb: "CNB: Describes animal actions, colors, and quantities using simple structured English sentences.",
+                intro: "Vocabulary review of pets and farm animals. Pantomime game: Act like a duck swimming and eating seeds without speaking.",
+                individual: "Workbook page 114, exercise #1 (Look at picture of Ivan and ducks, answer questions on quantity, names, colors, actions) and #2 (Circle and color an animal).",
+                indSolutionTitle: "🔍 Click here for Ivan's Ducks Answer Key",
+                indSolutionContent: "1. Ivan has 3 ducks (or count from picture). 2. Their names are... 3. They're white/brown. 4. They are swimming/eating.",
+                coop: "Small groups: Compare their chosen animal from exercise #2. Discuss its color and what it is doing.",
+                plenary: "Groups share their animal descriptions. Guiding question: 'How does resting and observing nature help us learn better?' Vocabulary Bingo.",
+                home: "Observe birds outside your window for 5 minutes and write down what they were doing."
+            },
+            {
+                week: "Week 8 (Sep 30 - Oct 12)",
+                unitNum: "Unit 9: Extended Reading",
+                theme: "Fable: 'Dog is Lucky!' & Unit Review (Student Book pp. 162-163)",
+                habit: "Habit 7 & Leadership Review: Sharpen the Saw / All Habits",
+                cnb: "CNB: Comprehends a short fable sequence, orders story events, and synthesizes unit learning.",
+                intro: "Warm-up vocabulary review of all Unit 8 (food) and Unit 9 (animals) words. Introduce fable characters: Dog, Bird, Cat, Fish from 'Dog is Lucky!' (p. 162).",
+                individual: "Student Book page 163, exercise #2 (Listen and check - number animals in order) and #3 (Answer questions about what Dog wants to do).",
+                indSolutionTitle: "🔍 Click here for Fable Order & Answers",
+                indSolutionContent: "Exercise 2 Order: 1. Bird, 2. Fish, 3. Cat (or as per audio track). Exercise 3: 1. Dog wants to fly, climb, and swim. 2. Fish says 'You play all day.' 3. Dog is lucky because he can enjoy many things!",
+                coop: "Groups of four: Choose activity #3 from page 163 (Make paper bag puppets for each animal and act out the fable).",
+                plenary: "Puppet show mini-performances by each team showcasing the fable. Guiding question: 'What makes each of us unique and lucky?' Unit 4 Celebration & Badge distribution.",
+                home: "Tell the story of 'Dog is Lucky!' to a family member using your own words or puppet."
+            }
+        ];
+
+        let currentWeekIndex = 0;
+        let currentTab = 0;
+
+        function renderWeekSelector() {
+            const container = document.getElementById('weekSelector');
+            container.innerHTML = '';
+            curriculumData.forEach((w, index) => {
+                const btn = document.createElement('button');
+                btn.className = `week-btn ${index === currentWeekIndex ? 'active' : ''}`;
+                btn.innerText = w.week;
+                btn.onclick = () => {
+                    currentWeekIndex = index;
+                    renderWeekSelector();
+                    updateContent();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function updateContent() {
+            const data = curriculumData[currentWeekIndex];
+            document.getElementById('badge-unit').innerText = data.unitNum;
+            document.getElementById('badge-habit').innerText = data.habit;
+            
+            // Pane 0
+            document.getElementById('intro-title').innerText = data.theme;
+            document.getElementById('intro-desc').innerHTML = `<strong>CNB Alignment:</strong> ${data.cnb}<br><br><strong>Activity:</strong> ${data.intro}`;
+
+            // Pane 1
+            document.getElementById('ind-desc').innerText = data.individual;
+            document.getElementById('ind-interactive').innerHTML = `
+                <button class="accordion" onclick="toggleAccordion(this)">${data.indSolutionTitle}</button>
+                <div class="panel">
+                    <p>${data.indSolutionContent}</p>
+                </div>
+            `;
+
+            // Pane 2
+            document.getElementById('coop-desc').innerText = data.coop;
+
+            // Pane 3
+            document.getElementById('plenary-desc').innerText = data.plenary;
+            document.getElementById('plenary-rubric').innerHTML = `
+                <h3>Interactive Plenary Rubric (1st Grade Reading)</h3>
+                <table>
+                    <tr>
+                        <th>Criteria</th>
+                        <th>Outstanding (4)</th>
+                        <th>Developing (3-2)</th>
+                    </tr>
+                    <tr>
+                        <td>1. Theme Mastery & Clarity</td>
+                        <td>Speaks clearly and uses unit vocabulary accurately.</td>
+                        <td>Needs slight prompting with pronunciation.</td>
+                    </tr>
+                    <tr>
+                        <td>2. Logic & Procedure</td>
+                        <td>Follows reading/workbook steps correctly.</td>
+                        <td>Needs guidance on exercise directions.</td>
+                    </tr>
+                    <tr>
+                        <td>3. Teamwork & Participation</td>
+                        <td>Cooperates actively with assigned roles.</td>
+                        <td>Participates passively or needs encouragement.</td>
+                    </tr>
+                    <tr>
+                        <td>4. Response & Engagement</td>
+                        <td>Answers guiding questions enthusiastically.</td>
+                        <td>Listens but hesitant to respond.</td>
+                    </tr>
+                </table>
+            `;
+            document.getElementById('home-text').innerText = data.home;
+        }
+
+        function switchTab(tabIndex) {
+            currentTab = tabIndex;
+            const tabs = document.querySelectorAll('.tab-btn');
+            const panes = document.querySelectorAll('.pane');
+
+            tabs.forEach((t, i) => {
+                t.classList.toggle('active', i === tabIndex);
+            });
+            panes.forEach((p, i) => {
+                p.classList.toggle('active', i === tabIndex);
+            });
+        }
+
+        function toggleAccordion(btn) {
+            btn.classList.toggle("active");
+            var panel = btn.nextElementSibling;
+            if (panel.style.maxHeight) {
+                panel.style.maxHeight = null;
+            } else {
+                panel.style.maxHeight = panel.scrollHeight + "px";
+            }
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    alert(`Error attempting to enable full-screen mode: ${err.message} (${err.name})`);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        // Initialize on load
+        window.onload = () => {
+            renderWeekSelector();
+            updateContent();
+        };
+    </script>
+</body>
+</html>
